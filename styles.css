@@ -5,20 +5,16 @@
     box-sizing: border-box;
 }
 
-/* rem 单位转换：html font-size = 1px，因此 1rem = 1px */
-/* Figma 设计稿尺寸直接用 rem 表示（不再 × 2） */
-html {
-    font-size: 1px;
-}
-
 body {
+    margin: 0;
+    padding: 0;
     font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
 /* Frame Root - 根容器 */
 .frame-root {
-    width: 1440rem; /* 1440px */
-    height: 960rem; /* 960px */
+    width: 100vw;
+    min-height: 100vh;
     margin: 0 auto;
     background-color: #FCFCF9;
     display: flex;
@@ -30,15 +26,15 @@ body {
     display: flex;
     justify-content: stretch;
     align-items: stretch;
-    padding: 12rem 74rem; /* 12px, 74px */
-    gap: 10rem; /* 10px */
+    padding: 12px 74px;
+    gap: 10px;
 }
 
 .app-title {
     font-family: 'Plus Jakarta Sans', sans-serif;
     font-weight: 700;
-    font-size: 18rem; /* 18px */
-    line-height: 1.2777777777777777;
+    font-size: 18px;
+    line-height: 1.28;
     text-align: left;
     color: #1C1C0D;
     flex: 1;
@@ -48,14 +44,14 @@ body {
 .main-content-frame {
     display: flex;
     justify-content: center;
-    padding: 20rem 160rem; /* 20px, 160px */
+    padding: 20px 160px;
     flex: 1;
 }
 
 .content-container {
-    width: 960rem; /* 960px */
-    height: 713rem; /* 713px */
-    padding: 20rem 0; /* 20px */
+    width: 960px;
+    max-width: 100%;
+    padding: 20px 0;
 }
 
 /* Pet Card - 宠物卡片 */
@@ -74,15 +70,15 @@ body {
 }
 
 .pet-image-wrapper {
-    padding: 12rem 16rem; /* 12px, 16px */
+    padding: 12px 16px;
     flex: 1;
 }
 
 .pet-image {
     width: 100%;
-    height: 218rem; /* 218px */
+    height: 218px;
     background: linear-gradient(135deg, #FFE5B4 0%, #FFD700 100%);
-    border-radius: 12rem; /* 12px */
+    border-radius: 12px;
     background-size: cover;
     background-position: center;
 }
@@ -92,13 +88,13 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 20rem 16rem 8rem; /* 20px, 16px, 8px */
+    padding: 20px 16px 8px;
 }
 
 .learning-title {
     font-family: 'Plus Jakarta Sans', sans-serif;
     font-weight: 700;
-    font-size: 24rem; /* 24px */
+    font-size: 24px;
     line-height: 1.25;
     text-align: center;
     color: #1C1C0D;
@@ -109,7 +105,7 @@ body {
 .speak-section {
     display: flex;
     justify-content: center;
-    padding: 12rem 16rem; /* 12px, 16px */
+    padding: 12px 16px;
 }
 
 .speak-button {
@@ -118,16 +114,16 @@ body {
     align-items: center;
     background-color: #FAFA1F;
     border: none;
-    border-radius: 24rem; /* 24px */
-    height: 48rem; /* 48px */
-    padding: 0 20rem; /* 20px */
+    border-radius: 24px;
+    height: 48px;
+    padding: 0 20px;
     cursor: pointer;
     transition: all 0.2s ease;
 }
 
 .speak-button:hover {
-    transform: translateY(-1rem);
-    box-shadow: 0 2rem 6rem rgba(250, 250, 31, 0.3);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 6px rgba(250, 250, 31, 0.3);
 }
 
 .speak-button:active {
@@ -137,7 +133,7 @@ body {
 .speak-button .button-text {
     font-family: 'Plus Jakarta Sans', sans-serif;
     font-weight: 700;
-    font-size: 16rem; /* 16px */
+    font-size: 16px;
     line-height: 1.5;
     text-align: center;
     color: #1C1C0D;
@@ -148,13 +144,13 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 4rem 16rem 12rem; /* 4px, 16px, 12px */
+    padding: 4px 16px 12px;
 }
 
 .hint-text {
     font-family: 'Plus Jakarta Sans', sans-serif;
     font-weight: 400;
-    font-size: 14rem; /* 14px */
+    font-size: 14px;
     line-height: 1.5;
     text-align: center;
     color: #9E9E47;
@@ -172,8 +168,8 @@ body {
     display: flex;
     justify-content: space-between;
     flex-wrap: wrap;
-    gap: 12rem; /* 12px */
-    padding: 12rem 16rem; /* 12px, 16px */
+    gap: 12px;
+    padding: 12px 16px;
     width: 100%;
 }
 
@@ -184,9 +180,9 @@ body {
     align-items: center;
     background-color: #E5E5E5;
     border: none;
-    border-radius: 20rem; /* 20px */
-    height: 40rem; /* 40px */
-    padding: 0 16rem; /* 16px */
+    border-radius: 20px;
+    height: 40px;
+    padding: 0 16px;
     cursor: pointer;
     flex: 1;
     transition: all 0.2s ease;
@@ -194,7 +190,7 @@ body {
 
 .back-home-button:hover {
     background-color: #D5D5D5;
-    transform: translateY(-1rem);
+    transform: translateY(-1px);
 }
 
 .back-home-button:active {
@@ -208,9 +204,9 @@ body {
     align-items: center;
     background-color: #FAFA1F;
     border: none;
-    border-radius: 20rem; /* 20px */
-    height: 40rem; /* 40px */
-    padding: 0 16rem; /* 16px */
+    border-radius: 20px;
+    height: 40px;
+    padding: 0 16px;
     cursor: pointer;
     flex: 1;
     transition: all 0.2s ease;
@@ -218,7 +214,7 @@ body {
 
 .progress-button:hover {
     background-color: #F0F01F;
-    transform: translateY(-1rem);
+    transform: translateY(-1px);
 }
 
 .progress-button:active {
@@ -229,7 +225,7 @@ body {
 .progress-button .button-text {
     font-family: 'Plus Jakarta Sans', sans-serif;
     font-weight: 700;
-    font-size: 14rem; /* 14px */
+    font-size: 14px;
     line-height: 1.5;
     text-align: center;
     color: #1C1C0D;
@@ -237,29 +233,18 @@ body {
 
 /* 响应式设计 */
 @media screen and (max-width: 1440px) {
-    .frame-root {
-        width: 100%;
-        height: auto;
-        min-height: 100vh;
-    }
-    
     .main-content-frame {
-        padding: 20rem 40rem;
-    }
-    
-    .content-container {
-        width: 100%;
-        height: auto;
+        padding: 20px 40px;
     }
 }
 
 @media screen and (max-width: 768px) {
     .header-frame {
-        padding: 12rem 20rem;
+        padding: 12px 20px;
     }
     
     .main-content-frame {
-        padding: 20rem 10rem;
+        padding: 20px 10px;
     }
     
     .button-group {

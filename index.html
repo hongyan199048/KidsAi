@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Magic Pet Island</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="supabase.js"></script>
+    <script src="ai-service.js"></script>
+    <script src="app.js"></script>
+</head>
+<body>
+    <div class="frame-root">
+        <!-- 顶部导航栏 Frame 1 -->
+        <div class="header-frame">
+            <h1 class="app-title">Magic Pet Island</h1>
+        </div>
+
+        <!-- 主内容区域 Depth 2, Frame 1 -->
+        <div class="main-content-frame">
+            <div class="content-container">
+                <!-- 宠物卡片区域 -->
+                <div class="pet-card">
+                    <!-- 宠物图片区域 -->
+                    <div class="pet-image-section">
+                        <div class="pet-image-wrapper">
+                            <div class="pet-image"></div>
+                        </div>
+                    </div>
+
+                    <!-- 标题区域 -->
+                    <div class="title-section">
+                        <h2 class="learning-title">Help me learn a new word!</h2>
+                    </div>
+
+                    <!-- Speak to Feed 按钮区域 -->
+                    <div class="speak-section">
+                        <button class="speak-button">
+                            <span class="button-text">Speak to Feed</span>
+                        </button>
+                    </div>
+
+                    <!-- 提示文字区域 -->
+                    <div class="hint-section">
+                        <p class="hint-text">Tap the microphone and say a word to feed your pet!</p>
+                    </div>
+
+                    <!-- 底部按钮组 -->
+                    <div class="bottom-section">
+                        <div class="button-group">
+                            <button class="back-home-button">
+                                <span class="button-text">Back Home</span>
+                            </button>
+                            <button class="progress-button">
+                                <span class="button-text">Progress</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

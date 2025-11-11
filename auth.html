@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Magic Pet Island</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="auth.css">
+    <script src="supabase.js"></script>
+    <script src="auth.js"></script>
+</head>
+<body>
+    <div class="auth-container">
+        <div class="auth-card">
+            <!-- Logo 区域 -->
+            <div class="auth-header">
+                <h1 class="auth-logo">🏝️ Magic Pet Island</h1>
+                <p class="auth-subtitle">Learn English by feeding your magical pet!</p>
+            </div>
+
+            <!-- 登录表单 -->
+            <div class="auth-form" id="loginForm">
+                <h2 class="form-title">Welcome Back!</h2>
+                
+                <div class="form-group">
+                    <label for="loginEmail">Email</label>
+                    <input 
+                        type="email" 
+                        id="loginEmail" 
+                        placeholder="your@email.com"
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="loginPassword">Password</label>
+                    <input 
+                        type="password" 
+                        id="loginPassword" 
+                        placeholder="Enter your password"
+                        required
+                    >
+                </div>
+
+                <button class="auth-button primary" id="loginButton">
+                    Sign In
+                </button>
+
+                <p class="form-switch">
+                    Don't have an account? 
+                    <a href="#" id="showSignup">Sign up</a>
+                </p>
+            </div>
+
+            <!-- 注册表单 -->
+            <div class="auth-form hidden" id="signupForm">
+                <h2 class="form-title">Create Account</h2>
+                
+                <div class="form-group">
+                    <label for="signupEmail">Email</label>
+                    <input 
+                        type="email" 
+                        id="signupEmail" 
+                        placeholder="your@email.com"
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="signupPassword">Password</label>
+                    <input 
+                        type="password" 
+                        id="signupPassword" 
+                        placeholder="At least 6 characters"
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="signupPasswordConfirm">Confirm Password</label>
+                    <input 
+                        type="password" 
+                        id="signupPasswordConfirm" 
+                        placeholder="Re-enter password"
+                        required
+                    >
+                </div>
+
+                <button class="auth-button primary" id="signupButton">
+                    Sign Up
+                </button>
+
+                <p class="form-switch">
+                    Already have an account? 
+                    <a href="#" id="showLogin">Sign in</a>
+                </p>
+            </div>
+
+            <!-- 消息提示 -->
+            <div class="auth-message hidden" id="authMessage"></div>
+
+            <!-- 加载状态 -->
+            <div class="auth-loading hidden" id="authLoading">
+                <div class="spinner"></div>
+                <p>Processing...</p>
+            </div>
+        </div>
+
+        <!-- 游客模式 -->
+        <div class="guest-mode">
+            <p>Just want to try?</p>
+            <a href="index.html" class="guest-link">Continue as Guest</a>
+        </div>
+    </div>
+</body>
+</html>

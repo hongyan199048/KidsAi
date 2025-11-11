@@ -1,0 +1,273 @@
+/* 全局样式 */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* rem 单位转换：html font-size = 1px，因此 1rem = 1px */
+/* Figma 设计稿尺寸直接用 rem 表示（不再 × 2） */
+html {
+    font-size: 1px;
+}
+
+body {
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+/* Frame Root - 根容器 */
+.frame-root {
+    width: 1440rem; /* 1440px */
+    height: 960rem; /* 960px */
+    margin: 0 auto;
+    background-color: #FCFCF9;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Header Frame - 顶部导航栏 */
+.header-frame {
+    display: flex;
+    justify-content: stretch;
+    align-items: stretch;
+    padding: 12rem 74rem; /* 12px, 74px */
+    gap: 10rem; /* 10px */
+}
+
+.app-title {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 700;
+    font-size: 18rem; /* 18px */
+    line-height: 1.2777777777777777;
+    text-align: left;
+    color: #1C1C0D;
+    flex: 1;
+}
+
+/* Main Content Frame - 主内容区域 */
+.main-content-frame {
+    display: flex;
+    justify-content: center;
+    padding: 20rem 160rem; /* 20px, 160px */
+    flex: 1;
+}
+
+.content-container {
+    width: 960rem; /* 960px */
+    height: 713rem; /* 713px */
+    padding: 20rem 0; /* 20px */
+}
+
+/* Pet Card - 宠物卡片 */
+.pet-card {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+}
+
+/* Pet Image Section - 宠物图片区域 */
+.pet-image-section {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.pet-image-wrapper {
+    padding: 12rem 16rem; /* 12px, 16px */
+    flex: 1;
+}
+
+.pet-image {
+    width: 100%;
+    height: 218rem; /* 218px */
+    background: linear-gradient(135deg, #FFE5B4 0%, #FFD700 100%);
+    border-radius: 12rem; /* 12px */
+    background-size: cover;
+    background-position: center;
+}
+
+/* Title Section - 标题区域 */
+.title-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20rem 16rem 8rem; /* 20px, 16px, 8px */
+}
+
+.learning-title {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 700;
+    font-size: 24rem; /* 24px */
+    line-height: 1.25;
+    text-align: center;
+    color: #1C1C0D;
+    width: 100%;
+}
+
+/* Speak Section - 按钮区域 */
+.speak-section {
+    display: flex;
+    justify-content: center;
+    padding: 12rem 16rem; /* 12px, 16px */
+}
+
+.speak-button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #FAFA1F;
+    border: none;
+    border-radius: 24rem; /* 24px */
+    height: 48rem; /* 48px */
+    padding: 0 20rem; /* 20px */
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.speak-button:hover {
+    transform: translateY(-1rem);
+    box-shadow: 0 2rem 6rem rgba(250, 250, 31, 0.3);
+}
+
+.speak-button:active {
+    transform: translateY(0);
+}
+
+.speak-button .button-text {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 700;
+    font-size: 16rem; /* 16px */
+    line-height: 1.5;
+    text-align: center;
+    color: #1C1C0D;
+}
+
+/* Hint Section - 提示文字区域 */
+.hint-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 4rem 16rem 12rem; /* 4px, 16px, 12px */
+}
+
+.hint-text {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 400;
+    font-size: 14rem; /* 14px */
+    line-height: 1.5;
+    text-align: center;
+    color: #9E9E47;
+    width: 100%;
+}
+
+/* Bottom Section - 底部按钮区域 */
+.bottom-section {
+    display: flex;
+    justify-content: stretch;
+    align-items: stretch;
+}
+
+.button-group {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12rem; /* 12px */
+    padding: 12rem 16rem; /* 12px, 16px */
+    width: 100%;
+}
+
+/* Back Home Button */
+.back-home-button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #E5E5E5;
+    border: none;
+    border-radius: 20rem; /* 20px */
+    height: 40rem; /* 40px */
+    padding: 0 16rem; /* 16px */
+    cursor: pointer;
+    flex: 1;
+    transition: all 0.2s ease;
+}
+
+.back-home-button:hover {
+    background-color: #D5D5D5;
+    transform: translateY(-1rem);
+}
+
+.back-home-button:active {
+    transform: translateY(0);
+}
+
+/* Progress Button */
+.progress-button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #FAFA1F;
+    border: none;
+    border-radius: 20rem; /* 20px */
+    height: 40rem; /* 40px */
+    padding: 0 16rem; /* 16px */
+    cursor: pointer;
+    flex: 1;
+    transition: all 0.2s ease;
+}
+
+.progress-button:hover {
+    background-color: #F0F01F;
+    transform: translateY(-1rem);
+}
+
+.progress-button:active {
+    transform: translateY(0);
+}
+
+.back-home-button .button-text,
+.progress-button .button-text {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 700;
+    font-size: 14rem; /* 14px */
+    line-height: 1.5;
+    text-align: center;
+    color: #1C1C0D;
+}
+
+/* 响应式设计 */
+@media screen and (max-width: 1440px) {
+    .frame-root {
+        width: 100%;
+        height: auto;
+        min-height: 100vh;
+    }
+    
+    .main-content-frame {
+        padding: 20rem 40rem;
+    }
+    
+    .content-container {
+        width: 100%;
+        height: auto;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .header-frame {
+        padding: 12rem 20rem;
+    }
+    
+    .main-content-frame {
+        padding: 20rem 10rem;
+    }
+    
+    .button-group {
+        flex-direction: column;
+    }
+    
+    .back-home-button,
+    .progress-button {
+        width: 100%;
+    }
+}

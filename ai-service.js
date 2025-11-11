@@ -1,11 +1,11 @@
 // AI 和语音识别服务配置
 const AI_CONFIG = {
     // 语音识别模式选择：'browser' 或 'whisper'
-    speechMode: 'browser', // 默认使用浏览器原生，改为 'whisper' 启用 Whisper API
+    speechMode: 'whisper', // 已切换到 Whisper API 高精度模式
     
     // OpenAI 配置（Whisper + GPT）
     openai: {
-        apiKey: 'YOUR_OPENAI_API_KEY', // 替换为你的 OpenAI API Key
+        apiKey: '', // 请在浏览器控制台设置: window.MagicPetAI.config.openai.apiKey = '你的API_KEY'
         whisperModel: 'whisper-1',
         gptModel: 'gpt-3.5-turbo',
         baseURL: 'https://api.openai.com/v1'

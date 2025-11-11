@@ -1,28 +1,35 @@
 // AI 和语音识别服务配置
 const AI_CONFIG = {
-    // 使用 Web Speech API（浏览器原生，免费）
-    useBrowserSpeech: true,
+    // 语音识别模式选择：'browser' 或 'whisper'
+    speechMode: 'browser', // 默认使用浏览器原生，改为 'whisper' 启用 Whisper API
     
-    // OpenAI 配置（可选，需要 API Key）
+    // OpenAI 配置（Whisper + GPT）
     openai: {
         apiKey: 'YOUR_OPENAI_API_KEY', // 替换为你的 OpenAI API Key
-        model: 'gpt-3.5-turbo',
+        whisperModel: 'whisper-1',
+        gptModel: 'gpt-3.5-turbo',
         baseURL: 'https://api.openai.com/v1'
     },
     
-    // 百度语音识别配置（可选）
-    baidu: {
-        apiKey: 'YOUR_BAIDU_API_KEY',
-        secretKey: 'YOUR_BAIDU_SECRET_KEY'
+    // Whisper 识别配置
+    whisper: {
+        language: 'en', // 识别语言：en, zh, auto（自动检测）
+        temperature: 0, // 0-1，越低越准确
+        prompt: 'apple, banana, cat, dog, pet, animal', // 提示词，提高准确率
+        responseFormat: 'verbose_json' // 返回详细信息包括时间戳
     }
 };
 
-// 语音识别服务
+// 语音识别服务（支持浏览器原生和 Whisper API）
 class SpeechRecognitionService {
     constructor() {
         this.recognition = null;
         this.isListening = false;
-        this.initBrowserSpeech();
+        this.mode = AI_CONFIG.speechMode;
+        
+        if (this.mode === 'browser') {
+            this.initBrowserSpeech();
+        }
     }
 
     // 初始化浏览器原生语音识别
@@ -42,8 +49,17 @@ class SpeechRecognitionService {
         }
     }
 
-    // 开始语音识别
+    // 开始语音识别（自动选择模式）
     async startListening() {
+        if (this.mode === 'whisper') {
+            return await this.startWhisperRecognition();
+        } else {
+            return await this.startBrowserRecognition();
+        }
+    }
+
+    // 浏览器原生语音识别
+    async startBrowserRecognition() {
         return new Promise((resolve, reject) => {
             if (!this.recognition) {
                 reject(new Error('语音识别不可用'));
@@ -87,6 +103,146 @@ class SpeechRecognitionService {
         });
     }
 
+    // Whisper API 语音识别
+    async startWhisperRecognition() {
+        try {
+            // 检查 API Key
+            if (!AI_CONFIG.openai.apiKey || AI_CONFIG.openai.apiKey === 'YOUR_OPENAI_API_KEY') {
+                throw new Error('请先配置 OpenAI API Key');
+            }
+
+            this.isListening = true;
+            console.log('🎤 开始录音（Whisper 模式）...');
+
+            // 录制音频
+            const audioBlob = await this.recordAudio();
+            
+            console.log('📤 发送到 Whisper API...');
+
+            // 创建 FormData
+            const formData = new FormData();
+            formData.append('file', audioBlob, 'audio.webm');
+            formData.append('model', AI_CONFIG.openai.whisperModel);
+            
+            // 添加可选参数
+            if (AI_CONFIG.whisper.language && AI_CONFIG.whisper.language !== 'auto') {
+                formData.append('language', AI_CONFIG.whisper.language);
+            }
+            if (AI_CONFIG.whisper.prompt) {
+                formData.append('prompt', AI_CONFIG.whisper.prompt);
+            }
+            if (AI_CONFIG.whisper.temperature !== undefined) {
+                formData.append('temperature', AI_CONFIG.whisper.temperature.toString());
+            }
+            if (AI_CONFIG.whisper.responseFormat) {
+                formData.append('response_format', AI_CONFIG.whisper.responseFormat);
+            }
+
+            // 调用 Whisper API
+            const response = await fetch(`${AI_CONFIG.openai.baseURL}/audio/transcriptions`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${AI_CONFIG.openai.apiKey}`
+                },
+                body: formData
+            });
+
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(`Whisper API 错误: ${error.error?.message || response.statusText}`);
+            }
+
+            const result = await response.json();
+            console.log('✅ Whisper 识别结果:', result);
+
+            this.isListening = false;
+
+            // 处理响应格式
+            if (AI_CONFIG.whisper.responseFormat === 'verbose_json') {
+                return {
+                    success: true,
+                    text: result.text,
+                    language: result.language,
+                    duration: result.duration,
+                    words: result.words, // 词级时间戳
+                    segments: result.segments, // 句子级时间戳
+                    confidence: this.calculateConfidence(result)
+                };
+            } else {
+                return {
+                    success: true,
+                    text: result.text || result,
+                    confidence: 0.95 // Whisper 默认高置信度
+                };
+            }
+
+        } catch (error) {
+            this.isListening = false;
+            console.error('Whisper 识别错误:', error);
+            throw error;
+        }
+    }
+
+    // 录制音频
+    async recordAudio(maxDuration = 10000) {
+        return new Promise(async (resolve, reject) => {
+            try {
+                // 请求麦克风权限
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                const mediaRecorder = new MediaRecorder(stream, {
+                    mimeType: 'audio/webm;codecs=opus'
+                });
+                
+                const audioChunks = [];
+
+                mediaRecorder.ondataavailable = (event) => {
+                    audioChunks.push(event.data);
+                };
+
+                mediaRecorder.onstop = () => {
+                    const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                    stream.getTracks().forEach(track => track.stop());
+                    resolve(audioBlob);
+                };
+
+                mediaRecorder.onerror = (error) => {
+                    stream.getTracks().forEach(track => track.stop());
+                    reject(error);
+                };
+
+                // 开始录音
+                mediaRecorder.start();
+
+                // 监听静音或最大时长
+                const stopRecording = () => {
+                    if (mediaRecorder.state === 'recording') {
+                        mediaRecorder.stop();
+                    }
+                };
+
+                // 最大录音时长
+                const maxTimer = setTimeout(stopRecording, maxDuration);
+
+                // 允许手动停止（通过检测静音或用户操作）
+                // 这里简化处理，实际可以添加静音检测
+                setTimeout(stopRecording, 5000); // 5秒后自动停止
+                clearTimeout(maxTimer);
+
+            } catch (error) {
+                reject(new Error('无法访问麦克风: ' + error.message));
+            }
+        });
+    }
+
+    // 计算平均置信度（从 verbose_json 结果）
+    calculateConfidence(result) {
+        if (result.words && result.words.length > 0) {
+            const avgProb = result.words.reduce((sum, word) => sum + (word.probability || 1), 0) / result.words.length;
+            return avgProb;
+        }
+        return 0.95; // 默认高置信度
+    }
+
     // 停止语音识别
     stopListening() {
         if (this.recognition && this.isListening) {
@@ -97,15 +253,31 @@ class SpeechRecognitionService {
 
     // 检查浏览器是否支持
     isSupported() {
+        if (this.mode === 'whisper') {
+            return true; // Whisper API 始终可用（如果有 API Key）
+        }
         return this.recognition !== null;
+    }
+
+    // 切换识别模式
+    switchMode(mode) {
+        if (mode === 'browser' || mode === 'whisper') {
+            this.mode = mode;
+            AI_CONFIG.speechMode = mode;
+            console.log(`🔄 切换到 ${mode} 模式`);
+            
+            if (mode === 'browser' && !this.recognition) {
+                this.initBrowserSpeech();
+            }
+        }
     }
 }
 
-// AI 服务（使用 OpenAI）
+// AI 服务（使用 OpenAI GPT）
 class AIService {
     constructor() {
         this.apiKey = AI_CONFIG.openai.apiKey;
-        this.model = AI_CONFIG.openai.model;
+        this.gptModel = AI_CONFIG.openai.gptModel;
         this.baseURL = AI_CONFIG.openai.baseURL;
     }
 
@@ -124,7 +296,7 @@ class AIService {
                     'Authorization': `Bearer ${this.apiKey}`
                 },
                 body: JSON.stringify({
-                    model: this.model,
+                    model: this.gptModel,
                     messages: [
                         {
                             role: 'system',
@@ -165,7 +337,7 @@ class AIService {
                     'Authorization': `Bearer ${this.apiKey}`
                 },
                 body: JSON.stringify({
-                    model: this.model,
+                    model: AI_CONFIG.openai.gptModel,
                     messages: [
                         {
                             role: 'system',
@@ -326,6 +498,8 @@ window.MagicPetAI = {
     startListening: () => speechRecognition.startListening(),
     stopListening: () => speechRecognition.stopListening(),
     isSpeechSupported: () => speechRecognition.isSupported(),
+    switchSpeechMode: (mode) => speechRecognition.switchMode(mode), // 切换识别模式
+    getCurrentMode: () => speechRecognition.mode, // 获取当前模式
     
     // AI 服务
     getLearningAdvice: (word, level) => aiService.getLearningAdvice(word, level),
@@ -334,7 +508,11 @@ window.MagicPetAI = {
     
     // 语音合成
     speakWord: (text, lang) => textToSpeech.speak(text, lang),
-    stopSpeaking: () => textToSpeech.stop()
+    stopSpeaking: () => textToSpeech.stop(),
+    
+    // 配置
+    config: AI_CONFIG
 };
 
 console.log('✅ AI 和语音服务初始化完成');
+console.log(`🎤 当前语音识别模式: ${AI_CONFIG.speechMode}`);

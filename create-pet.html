@@ -28,41 +28,91 @@
                 <div class="create-pet-card">
                     <!-- 标题区域 -->
                     <div class="title-section">
-                        <h2 class="main-title">🎨 Create Your Magic Pet!</h2>
-                        <p class="subtitle">Describe your dream pet and AI will bring it to life!</p>
+                        <h2 class="main-title">🎉 Choose Your Pet!</h2>
+                        <p class="subtitle">Select a cute pet to be your learning companion!</p>
                     </div>
 
-                    <!-- 宠物预览区域 -->
-                    <div class="pet-preview-section">
-                        <div class="pet-preview" id="petPreview">
-                            <div class="placeholder-icon">🐾</div>
-                            <p class="placeholder-text">Your pet will appear here</p>
+                    <!-- 宠物卡片滚动区域 -->
+                    <div class="pets-carousel-container">
+                        <button class="carousel-btn prev-btn" id="prevBtn">❮</button>
+                        
+                        <div class="pets-carousel" id="petsCarousel">
+                            <!-- 小恐龙 -->
+                            <div class="pet-card" data-pet="dinosaur">
+                                <div class="pet-icon">🦕</div>
+                                <h3 class="pet-name">Dino</h3>
+                                <p class="pet-desc">Brave & Strong</p>
+                            </div>
+                            
+                            <!-- 小兔子 -->
+                            <div class="pet-card" data-pet="rabbit">
+                                <div class="pet-icon">🐰</div>
+                                <h3 class="pet-name">Bunny</h3>
+                                <p class="pet-desc">Quick & Clever</p>
+                            </div>
+                            
+                            <!-- 小乌龟 -->
+                            <div class="pet-card" data-pet="turtle">
+                                <div class="pet-icon">🐢</div>
+                                <h3 class="pet-name">Shelly</h3>
+                                <p class="pet-desc">Patient & Wise</p>
+                            </div>
+                            
+                            <!-- 小斑马 -->
+                            <div class="pet-card" data-pet="zebra">
+                                <div class="pet-icon">🦓</div>
+                                <h3 class="pet-name">Ziggy</h3>
+                                <p class="pet-desc">Unique & Fun</p>
+                            </div>
+                            
+                            <!-- 小长颈鹿 -->
+                            <div class="pet-card" data-pet="giraffe">
+                                <div class="pet-icon">🦒</div>
+                                <h3 class="pet-name">Gigi</h3>
+                                <p class="pet-desc">Tall & Gentle</p>
+                            </div>
+                            
+                            <!-- 小狮子 -->
+                            <div class="pet-card" data-pet="lion">
+                                <div class="pet-icon">🦁</div>
+                                <h3 class="pet-name">Leo</h3>
+                                <p class="pet-desc">Brave & Royal</p>
+                            </div>
+                            
+                            <!-- 小猫咪 -->
+                            <div class="pet-card" data-pet="cat">
+                                <div class="pet-icon">🐱</div>
+                                <h3 class="pet-name">Kitty</h3>
+                                <p class="pet-desc">Cute & Playful</p>
+                            </div>
+                            
+                            <!-- 小老虎 -->
+                            <div class="pet-card" data-pet="tiger">
+                                <div class="pet-icon">🐯</div>
+                                <h3 class="pet-name">Tiger</h3>
+                                <p class="pet-desc">Strong & Bold</p>
+                            </div>
                         </div>
+                        
+                        <button class="carousel-btn next-btn" id="nextBtn">❯</button>
                     </div>
 
-                    <!-- 语音按钮 -->
-                    <div class="voice-section">
-                        <button class="voice-button" id="voiceButton">
-                            <span class="mic-icon">🎤</span>
-                            <span class="button-text">Describe Your Pet</span>
-                        </button>
-                        <p class="hint-text">Tap and say something like: "A cute blue dragon with wings!"</p>
+                    <!-- 选中提示 -->
+                    <div class="selected-pet-info" id="selectedInfo">
+                        <p>👉 Swipe or click arrows to see more pets!</p>
                     </div>
 
-                    <!-- 生成按钮 -->
+                    <!-- 操作按钮区域 -->
                     <div class="action-section">
-                        <button class="generate-button hidden" id="generateButton">
-                            <span class="button-text">✨ Generate My Pet</span>
-                        </button>
-                        <button class="skip-button" id="skipButton">
-                            <span class="button-text">Skip & Use Default Pet</span>
+                        <button class="confirm-button" id="confirmButton">
+                            <span class="button-text">✨ Choose This Pet</span>
                         </button>
                     </div>
 
                     <!-- 加载状态 -->
                     <div class="loading-overlay hidden" id="loadingOverlay">
                         <div class="spinner"></div>
-                        <p>Creating your magical pet...</p>
+                        <p>Setting up your pet...</p>
                     </div>
                 </div>
             </div>

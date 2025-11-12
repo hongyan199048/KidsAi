@@ -32,48 +32,148 @@
     margin: 0;
 }
 
-/* 宠物预览区域 */
-.pet-preview-section {
-    display: flex;
-    justify-content: center;
-    margin-bottom: 30px;
+/* 宠物卡片轮播区域 */
+.pets-carousel-container {
+    position: relative;
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto 30px;
+    padding: 0 50px;
 }
 
-.pet-preview {
-    width: 300px;
-    height: 300px;
+.pets-carousel {
+    display: flex;
+    gap: 20px;
+    overflow-x: auto;
+    scroll-behavior: smooth;
+    padding: 20px 0;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.pets-carousel::-webkit-scrollbar {
+    display: none;
+}
+
+.pet-card {
+    min-width: 200px;
+    height: 240px;
     background: linear-gradient(135deg, #FFE5B4 0%, #FFD700 100%);
     border-radius: 20px;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    position: relative;
-    overflow: hidden;
+    cursor: pointer;
     transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    position: relative;
 }
 
-.pet-preview.has-image {
-    background: #F5F5F5;
+.pet-card:hover {
+    transform: translateY(-10px) scale(1.05);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
 }
 
-.pet-preview img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    border-radius: 20px;
+.pet-card.selected {
+    background: linear-gradient(135deg, #FAFA1F 0%, #F0F01F 100%);
+    transform: scale(1.1);
+    box-shadow: 0 8px 32px rgba(250, 250, 31, 0.4);
+    border: 3px solid #F0F01F;
 }
 
-.placeholder-icon {
+.pet-card.selected::after {
+    content: '✔';
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: #4CAF50;
+    color: white;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.pet-icon {
     font-size: 80px;
     margin-bottom: 10px;
-    opacity: 0.6;
+    transition: transform 0.3s ease;
 }
 
-.placeholder-text {
+.pet-card:hover .pet-icon {
+    transform: scale(1.2) rotate(5deg);
+}
+
+.pet-name {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 700;
+    font-size: 20px;
+    color: #1C1C0D;
+    margin: 10px 0 5px;
+}
+
+.pet-desc {
     font-size: 14px;
     color: #666;
-    opacity: 0.8;
+    text-align: center;
+    margin: 0;
+}
+
+/* 轮播按钮 */
+.carousel-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(255, 255, 255, 0.9);
+    border: 2px solid #E5E5E5;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    font-size: 20px;
+    color: #666;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.carousel-btn:hover {
+    background: #FAFA1F;
+    border-color: #FAFA1F;
+    transform: translateY(-50%) scale(1.1);
+}
+
+.prev-btn {
+    left: 0;
+}
+
+.next-btn {
+    right: 0;
+}
+
+/* 选中提示 */
+.selected-pet-info {
+    text-align: center;
+    margin-bottom: 20px;
+    min-height: 30px;
+}
+
+.selected-pet-info p {
+    font-size: 14px;
+    color: #999;
+    margin: 0;
+}
+
+.selected-pet-info.show-selected p {
+    color: #4CAF50;
+    font-weight: 600;
 }
 
 /* 语音按钮区域 */
@@ -137,7 +237,8 @@
     align-items: center;
 }
 
-.generate-button {
+/* 确认按钮 */
+.confirm-button {
     background: #FAFA1F;
     color: #1C1C0D;
     border: none;
@@ -150,18 +251,19 @@
     box-shadow: 0 4px 12px rgba(250, 250, 31, 0.3);
 }
 
-.generate-button:hover {
+.confirm-button:hover {
     background: #F0F01F;
     transform: translateY(-2px);
     box-shadow: 0 6px 16px rgba(250, 250, 31, 0.4);
 }
 
-.generate-button:active {
+.confirm-button:active {
     transform: translateY(0);
 }
 
-.generate-button.hidden {
-    display: none;
+.confirm-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
 }
 
 .skip-button {
@@ -237,17 +339,30 @@
         font-size: 14px;
     }
 
-    .pet-preview {
-        width: 250px;
-        height: 250px;
+    .pets-carousel-container {
+        padding: 0 40px;
     }
 
-    .voice-button {
-        font-size: 16px;
-        padding: 12px 24px;
+    .pet-card {
+        min-width: 180px;
+        height: 220px;
     }
 
-    .generate-button {
+    .pet-icon {
+        font-size: 60px;
+    }
+
+    .pet-name {
+        font-size: 18px;
+    }
+
+    .carousel-btn {
+        width: 35px;
+        height: 35px;
+        font-size: 18px;
+    }
+
+    .confirm-button {
         font-size: 16px;
         padding: 12px 32px;
     }

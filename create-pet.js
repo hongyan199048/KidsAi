@@ -1,8 +1,7 @@
-// 宠物生成页面逻辑
-class PetCreator {
+// 宠物选择页面逻辑
+class PetSelector {
     constructor() {
-        this.petDescription = '';
-        this.petImageUrl = '';
+        this.selectedPet = null;
         this.init();
     }
 
@@ -19,7 +18,10 @@ class PetCreator {
         // 绑定事件
         this.bindEvents();
         
-        console.log('✅ 宠物生成器初始化完成');
+        // 默认选中第一个宠物
+        this.selectFirstPet();
+        
+        console.log('✅ 宠物选择器初始化完成');
     }
 
     async waitForServices() {
@@ -95,76 +97,101 @@ class PetCreator {
     }
 
     bindEvents() {
-        // 语音按钮
-        const voiceButton = document.getElementById('voiceButton');
-        if (voiceButton) {
-            voiceButton.addEventListener('click', () => this.handleVoiceInput());
+        // 宠物卡片点击
+        const petCards = document.querySelectorAll('.pet-card');
+        petCards.forEach(card => {
+            card.addEventListener('click', () => this.selectPet(card));
+        });
+
+        // 轮播按钮
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const carousel = document.getElementById('petsCarousel');
+        
+        if (prevBtn) {
+            prevBtn.addEventListener('click', () => {
+                carousel.scrollBy({ left: -220, behavior: 'smooth' });
+            });
+        }
+        
+        if (nextBtn) {
+            nextBtn.addEventListener('click', () => {
+                carousel.scrollBy({ left: 220, behavior: 'smooth' });
+            });
         }
 
-        // 生成按钮
-        const generateButton = document.getElementById('generateButton');
-        if (generateButton) {
-            generateButton.addEventListener('click', () => this.handleGenerate());
+        // 确认按钮
+        const confirmButton = document.getElementById('confirmButton');
+        if (confirmButton) {
+            confirmButton.addEventListener('click', () => this.confirmSelection());
         }
+        
+        // 触摸滑动支持
+        if (carousel) {
+            let isDown = false;
+            let startX;
+            let scrollLeft;
 
-        // 跳过按钮
-        const skipButton = document.getElementById('skipButton');
-        if (skipButton) {
-            skipButton.addEventListener('click', () => this.handleSkip());
-        }
-    }
+            carousel.addEventListener('mousedown', (e) => {
+                isDown = true;
+                startX = e.pageX - carousel.offsetLeft;
+                scrollLeft = carousel.scrollLeft;
+            });
 
-    async handleVoiceInput() {
-        const voiceButton = document.getElementById('voiceButton');
-        const descriptionText = document.getElementById('descriptionText');
+            carousel.addEventListener('mouseleave', () => {
+                isDown = false;
+            });
 
-        try {
-            // 检查浏览器支持
-            if (!window.MagicPetAI.isSpeechSupported()) {
-                alert('⚠️ Your browser does not support voice recognition. Please try Chrome or Edge.');
-                return;
-            }
+            carousel.addEventListener('mouseup', () => {
+                isDown = false;
+            });
 
-            // 更新按钮状态
-            voiceButton.classList.add('listening');
-            voiceButton.querySelector('.button-text').textContent = 'Listening...';
-            descriptionText.textContent = 'Listening... Describe your pet now!';
-            descriptionText.classList.add('empty');
-
-            // 开始语音识别
-            const result = await window.MagicPetAI.startListening();
-
-            if (result.success && result.text) {
-                this.petDescription = result.text;
-                descriptionText.textContent = result.text;
-                descriptionText.classList.remove('empty');
-
-                // 显示生成按钮
-                const generateButton = document.getElementById('generateButton');
-                generateButton.classList.remove('hidden');
-
-                this.showMessage('✅ Great! Now click "Generate My Pet" to create it!', 'success');
-            }
-        } catch (error) {
-            console.error('语音识别错误:', error);
-            descriptionText.textContent = 'Press the button and describe your pet...';
-            descriptionText.classList.add('empty');
-            
-            if (error.message === 'no-speech') {
-                this.showMessage('⚠️ No speech detected. Please try again!', 'error');
-            } else {
-                this.showMessage('❌ Voice recognition failed. Please try again.', 'error');
-            }
-        } finally {
-            // 恢复按钮状态
-            voiceButton.classList.remove('listening');
-            voiceButton.querySelector('.button-text').textContent = 'Describe Your Pet';
+            carousel.addEventListener('mousemove', (e) => {
+                if (!isDown) return;
+                e.preventDefault();
+                const x = e.pageX - carousel.offsetLeft;
+                const walk = (x - startX) * 2;
+                carousel.scrollLeft = scrollLeft - walk;
+            });
         }
     }
 
-    async handleGenerate() {
-        if (!this.petDescription) {
-            this.showMessage('⚠️ Please describe your pet first!', 'error');
+    selectFirstPet() {
+        const firstCard = document.querySelector('.pet-card');
+        if (firstCard) {
+            this.selectPet(firstCard);
+        }
+    }
+
+    selectPet(card) {
+        // 移除所有选中状态
+        document.querySelectorAll('.pet-card').forEach(c => {
+            c.classList.remove('selected');
+        });
+        
+        // 添加选中状态
+        card.classList.add('selected');
+        
+        // 保存选中的宠物
+        this.selectedPet = {
+            type: card.dataset.pet,
+            name: card.querySelector('.pet-name').textContent,
+            icon: card.querySelector('.pet-icon').textContent
+        };
+        
+        // 更新提示信息
+        const selectedInfo = document.getElementById('selectedInfo');
+        if (selectedInfo) {
+            selectedInfo.classList.add('show-selected');
+            selectedInfo.innerHTML = `<p>🎉 You selected <strong>${this.selectedPet.name}</strong>! Click "Choose This Pet" to continue.</p>`;
+        }
+        
+        console.log('选中宠物:', this.selectedPet);
+    }
+
+    async confirmSelection() {
+        if (!this.selectedPet) {
+            alert('⚠️ Please select a pet first!');
             return;
         }
 
@@ -173,41 +200,18 @@ class PetCreator {
         loadingOverlay.classList.remove('hidden');
 
         try {
-            // 这里调用 AI 生成图片
-            // 由于需要 OpenAI DALL-E API，暂时使用占位符
-            await this.generatePetImage(this.petDescription);
-
             // 保存宠物信息到数据库
             await this.savePetToDatabase();
 
             // 跳转到主页
             setTimeout(() => {
                 window.location.href = 'index.html';
-            }, 2000);
+            }, 1500);
         } catch (error) {
-            console.error('生成宠物失败:', error);
-            this.showMessage('❌ Failed to create pet. Please try again.', 'error');
+            console.error('保存宠物失败:', error);
+            alert('❌ Failed to save pet. Please try again.');
             loadingOverlay.classList.add('hidden');
         }
-    }
-
-    async generatePetImage(description) {
-        // 模拟生成过程
-        await new Promise(resolve => setTimeout(resolve, 2000));
-
-        // TODO: 集成 DALL-E API 或其他图片生成服务
-        // 目前使用渐变色作为占位符
-        const petPreview = document.getElementById('petPreview');
-        petPreview.innerHTML = `
-            <div style="width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
-                <div style="font-size: 80px;">🎨</div>
-                <p style="color: white; font-size: 14px; margin-top: 10px; text-align: center; padding: 0 20px;">
-                    ${description}
-                </p>
-            </div>
-        `;
-
-        this.petImageUrl = 'placeholder'; // 实际应该是生成的图片 URL
     }
 
     async savePetToDatabase() {
@@ -219,32 +223,17 @@ class PetCreator {
             // 需要创建一个 pets 表
             console.log('保存宠物信息:', {
                 userId: user.id,
-                description: this.petDescription,
-                imageUrl: this.petImageUrl
+                petType: this.selectedPet.type,
+                petName: this.selectedPet.name,
+                petIcon: this.selectedPet.icon
             });
         } catch (error) {
             console.error('保存宠物失败:', error);
-        }
-    }
-
-    handleSkip() {
-        // 使用默认宠物，直接跳转
-        if (confirm('Skip creating a custom pet and use the default one?')) {
-            window.location.href = 'index.html';
-        }
-    }
-
-    showMessage(text, type = 'info') {
-        // 简单的消息提示
-        const hint = document.querySelector('.hint-text');
-        if (hint) {
-            hint.textContent = text;
-            hint.style.color = type === 'error' ? '#C62828' : type === 'success' ? '#2E7D32' : '#9E9E47';
         }
     }
 }
 
 // 页面加载完成后初始化
 document.addEventListener('DOMContentLoaded', () => {
-    window.petCreator = new PetCreator();
+    window.petSelector = new PetSelector();
 });

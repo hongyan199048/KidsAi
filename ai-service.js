@@ -143,7 +143,7 @@ class SpeechRecognitionService {
             });
 
             if (!response.ok) {
-                const error = await response.json();
+                const error = await response.json().catch(() => ({ error: response.statusText }));
                 throw new Error(`API 错误: ${error.error || response.statusText}`);
             }
 
@@ -173,8 +173,27 @@ class SpeechRecognitionService {
 
         } catch (error) {
             this.isListening = false;
-            console.error('Whisper 识别错误:', error);
-            throw error;
+            console.error('❌ Whisper 识别错误:', error);
+            
+            // 自动降级到浏览器原生模式
+            console.log('🔄 Whisper API 不可用，自动切换到浏览器原生识别...');
+            
+            // 初始化浏览器识别（如果还未初始化）
+            if (!this.recognition) {
+                this.initBrowserSpeech();
+            }
+            
+            // 尝试使用浏览器识别
+            if (this.recognition) {
+                try {
+                    return await this.startBrowserRecognition();
+                } catch (browserError) {
+                    console.error('❌ 浏览器识别也失败:', browserError);
+                    throw new Error('语音识别不可用：Whisper API 和浏览器识别都失败');
+                }
+            } else {
+                throw new Error('语音识别不可用：浏览器不支持语音识别');
+            }
         }
     }
 

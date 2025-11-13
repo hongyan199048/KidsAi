@@ -128,9 +128,9 @@ class AuthManager {
             if (result.success) {
                 this.showMessage('✅ Login successful! Redirecting...', 'success');
                 
-                // 延迟跳转到宠物生成页面
+                // 登录成功后跳转到学习页面
                 setTimeout(() => {
-                    window.location.href = 'create-pet.html';
+                    window.location.href = 'index.html';
                 }, 1500);
             } else {
                 this.showMessage(`❌ Login failed: ${result.error}`, 'error');

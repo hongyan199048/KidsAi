@@ -333,8 +333,8 @@ class MagicPetApp {
             }, 300);
         }
 
-        // 检查是否达到 5 次喂食（临时改为1次，方便测试）
-        if (this.feedCount === 0 && !this.petUpgraded) {
+        // 检查是否达到 5 次喂食
+        if (this.feedCount === 5 && !this.petUpgraded) {
             setTimeout(() => {
                 this.upgradePet();
             }, 1000);
@@ -364,24 +364,64 @@ class MagicPetApp {
     // 显示进度
     async showProgress() {
         try {
-            if (window.MagicPetAPI) {
-                const result = await window.MagicPetAPI.Database.getProgress();
-                if (result.success && result.data) {
-                    alert(`📊 Your Progress:\n\n` +
-                          `Words Learned: ${result.data.words_learned}\n` +
-                          `Total Score: ${result.data.total_score}\n\n` +
-                          `Keep learning! 🌟`);
-                    return;
-                }
+            // 检查用户是否已登录
+            let isLoggedIn = false;
+            let user = null;
+            
+            if (window.MagicPetAPI && window.MagicPetAPI.Auth) {
+                user = await window.MagicPetAPI.Auth.getCurrentUser();
+                isLoggedIn = !!user;
             }
             
-            // 本地进度
-            alert(`📊 Your Progress:\n\n` +
-                  `Words Learned: ${this.wordsLearned.length}\n` +
-                  `Total Score: ${this.score}\n\n` +
-                  `Keep learning! 🌟`);
+            if (!isLoggedIn) {
+                // 未登录：显示提示框
+                const wantToSave = confirm(
+                    '💾 想要保存您的学习进度吗？\n\n' +
+                    '登录后可以：\n' +
+                    '✅ 保存学习记录\n' +
+                    '✅ 跨设备同步\n' +
+                    '✅ 解锁更多奖励\n\n' +
+                    '点击“确定”去登录，点击“取消”继续游客模式'
+                );
+                
+                if (wantToSave) {
+                    // 跳转到登录页
+                    window.location.href = 'auth.html';
+                    return;
+                } else {
+                    // 显示本地进度（仅当前会话）
+                    alert(
+                        `📊 您的本次学习进度：\n\n` +
+                        `学习单词数：${this.wordsLearned.length}\n` +
+                        `总分：${this.score}\n` +
+                        `喂食次数：${this.feedCount}\n\n` +
+                        `⚠️ 注意：未登录的进度不会保存，刷新页面将丢失。`
+                    );
+                }
+                return;
+            }
+            
+            // 已登录：显示数据库中的进度
+            const result = await window.MagicPetAPI.Database.getProgress();
+            if (result.success && result.data) {
+                alert(
+                    `📊 ${user.email} 的学习进度：\n\n` +
+                    `学习单词数：${result.data.words_learned}\n` +
+                    `总分：${result.data.total_score}\n\n` +
+                    `继续加油！🌟`
+                );
+            } else {
+                // 数据库查询失败，显示本地进度
+                alert(
+                    `📊 您的本次学习进度：\n\n` +
+                    `学习单词数：${this.wordsLearned.length}\n` +
+                    `总分：${this.score}\n\n` +
+                    `继续加油！🌟`
+                );
+            }
         } catch (error) {
             console.error('获取进度失败:', error);
+            alert('❌ 获取进度失败，请稍后重试。');
         }
     }
 

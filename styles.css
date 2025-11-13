@@ -81,6 +81,64 @@ body {
     border-radius: 12px;
     background-size: cover;
     background-position: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 120px;
+    user-select: none;
+}
+
+.pet-image:hover {
+    transform: scale(1.05);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+}
+
+.pet-image:active {
+    transform: scale(0.98);
+}
+
+/* 宠物升级动画 */
+.pet-image.pet-upgrading {
+    animation: upgrading 1.5s ease-in-out;
+}
+
+@keyframes upgrading {
+    0%, 100% {
+        transform: scale(1);
+        filter: brightness(1);
+    }
+    25% {
+        transform: scale(1.2) rotate(5deg);
+        filter: brightness(1.5);
+    }
+    50% {
+        transform: scale(0.8) rotate(-5deg);
+        filter: brightness(2);
+    }
+    75% {
+        transform: scale(1.2) rotate(5deg);
+        filter: brightness(1.5);
+    }
+}
+
+.pet-image.pet-upgraded {
+    animation: celebrate 0.6s ease-out;
+}
+
+@keyframes celebrate {
+    0% {
+        transform: scale(0.5);
+        opacity: 0;
+    }
+    50% {
+        transform: scale(1.1);
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
 }
 
 /* Title Section - 标题区域 */

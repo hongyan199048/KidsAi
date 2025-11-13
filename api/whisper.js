@@ -1,5 +1,5 @@
-// Vercel Serverless Function - Whisper API 代理
-// 用于安全地调用 OpenAI Whisper API，不暴露 API Key
+// Vercel Serverless Function - Minimax Speech API 代理
+// 用于安全地调用 Minimax 语音识别 API，不暴露 API Key
 
 export const config = {
     api: {
@@ -15,10 +15,11 @@ export default async function handler(req, res) {
 
     try {
         // 从环境变量获取 API Key（安全）
-        const apiKey = process.env.OPENAI_API_KEY;
+        const apiKey = process.env.MINIMAX_API_KEY;
+        const groupId = process.env.MINIMAX_GROUP_ID;
         
-        if (!apiKey) {
-            return res.status(500).json({ error: 'API key not configured' });
+        if (!apiKey || !groupId) {
+            return res.status(500).json({ error: 'Minimax API key or Group ID not configured' });
         }
 
         // 获取请求体（音频数据）
@@ -28,51 +29,59 @@ export default async function handler(req, res) {
         }
         const buffer = Buffer.concat(chunks);
 
-        // 转发请求到 OpenAI Whisper API
+        // 准备 FormData
+        const FormData = require('form-data');
         const formData = new FormData();
-        const audioBlob = new Blob([buffer], { type: 'audio/webm' });
-        formData.append('file', audioBlob, 'audio.webm');
-        formData.append('model', 'whisper-1');
         
-        // 从查询参数获取可选配置
-        const { language, prompt, temperature, response_format } = req.query;
+        // 添加音频文件
+        formData.append('file', buffer, {
+            filename: 'audio.webm',
+            contentType: 'audio/webm'
+        });
         
-        if (language && language !== 'auto') {
-            formData.append('language', language);
-        }
-        if (prompt) {
-            formData.append('prompt', prompt);
-        }
-        if (temperature) {
-            formData.append('temperature', temperature);
-        }
-        if (response_format) {
-            formData.append('response_format', response_format);
+        // 添加可选参数
+        formData.append('model', 'speech-01'); // Minimax 语音模型
+        
+        const { language } = req.query;
+        if (language) {
+            formData.append('language', language === 'en' ? 'en' : 'zh'); // 仅支持 en 和 zh
         }
 
-        // 调用 OpenAI API
-        const response = await fetch('https://api.openai.com/v1/audio/transcriptions', {
+        // 调用 Minimax API
+        const response = await fetch(`https://api.minimax.chat/v1/speech_to_text?GroupId=${groupId}`, {
             method: 'POST',
             headers: {
-                'Authorization': `Bearer ${apiKey}`
+                'Authorization': `Bearer ${apiKey}`,
+                ...formData.getHeaders()
             },
             body: formData
         });
 
         if (!response.ok) {
-            const error = await response.json();
+            const error = await response.json().catch(() => ({ error: response.statusText }));
             return res.status(response.status).json({ 
-                error: error.error?.message || 'Whisper API error' 
+                error: error.base_resp?.status_msg || error.error || 'Minimax API error' 
             });
         }
 
         const result = await response.json();
         
-        // 返回结果
-        return res.status(200).json(result);
+        // 转换 Minimax 响应为统一格式
+        if (result.base_resp?.status_code === 0 && result.text) {
+            return res.status(200).json({
+                text: result.text,
+                language: result.language || 'en',
+                duration: result.audio_length || 0,
+                confidence: 0.95 // Minimax 没有置信度，默认高值
+            });
+        } else {
+            return res.status(500).json({ 
+                error: result.base_resp?.status_msg || 'Recognition failed' 
+            });
+        }
 
     } catch (error) {
-        console.error('Whisper proxy error:', error);
+        console.error('Minimax proxy error:', error);
         return res.status(500).json({ 
             error: 'Internal server error',
             message: error.message 

@@ -1,27 +1,17 @@
 // AI 和语音识别服务配置
 const AI_CONFIG = {
-    // 语音识别模式选择：'browser' 或 'whisper'
-    speechMode: 'whisper', // Whisper API 高精度模式（需要配置 OpenAI API Key）
+    // 语音识别模式选择：'browser' 或 'minimax'
+    speechMode: 'minimax', // Minimax Speech-01 高精度模式（需要配置 API Key）
     
     // 后端 API 代理配置（安全）
     apiProxy: {
-        whisperUrl: '/api/whisper', // 后端代理接口，不暴露 API Key
+        speechUrl: '/api/whisper', // 后端代理接口，不暴露 API Key
     },
     
-    // OpenAI 配置（仅用于直接调用，不推荐）
-    openai: {
-        apiKey: '', // 已迁移到后端，前端不再需要
-        whisperModel: 'whisper-1',
-        gptModel: 'gpt-3.5-turbo',
-        baseURL: 'https://api.openai.com/v1'
-    },
-    
-    // Whisper 识别配置
-    whisper: {
-        language: 'en', // 识别语言：en, zh, auto（自动检测）
-        temperature: 0, // 0-1，越低越准确
-        prompt: 'apple, banana, cat, dog, pet, animal', // 提示词，提高准确率
-        responseFormat: 'verbose_json' // 返回详细信息包括时间戳
+    // Minimax 识别配置
+    minimax: {
+        language: 'en', // 识别语言：en, zh
+        model: 'speech-01' // Minimax 语音模型
     }
 };
 
@@ -56,8 +46,8 @@ class SpeechRecognitionService {
 
     // 开始语音识别（自动选择模式）
     async startListening() {
-        if (this.mode === 'whisper') {
-            return await this.startWhisperRecognition();
+        if (this.mode === 'minimax') {
+            return await this.startMinimaxRecognition();
         } else {
             return await this.startBrowserRecognition();
         }
@@ -108,11 +98,11 @@ class SpeechRecognitionService {
         });
     }
 
-    // Whisper API 语音识别（通过后端代理）
-    async startWhisperRecognition() {
+    // Minimax API 语音识别（通过后端代理）
+    async startMinimaxRecognition() {
         try {
             this.isListening = true;
-            console.log('🎤 开始录音（Whisper 模式）...');
+            console.log('🎤 开始录音（Minimax 模式）...');
 
             // 录制音频
             const audioBlob = await this.recordAudio();
@@ -121,20 +111,11 @@ class SpeechRecognitionService {
 
             // 构建请求 URL 和参数
             const params = new URLSearchParams();
-            if (AI_CONFIG.whisper.language && AI_CONFIG.whisper.language !== 'auto') {
-                params.append('language', AI_CONFIG.whisper.language);
-            }
-            if (AI_CONFIG.whisper.prompt) {
-                params.append('prompt', AI_CONFIG.whisper.prompt);
-            }
-            if (AI_CONFIG.whisper.temperature !== undefined) {
-                params.append('temperature', AI_CONFIG.whisper.temperature.toString());
-            }
-            if (AI_CONFIG.whisper.responseFormat) {
-                params.append('response_format', AI_CONFIG.whisper.responseFormat);
+            if (AI_CONFIG.minimax.language) {
+                params.append('language', AI_CONFIG.minimax.language);
             }
 
-            const url = `${AI_CONFIG.apiProxy.whisperUrl}?${params.toString()}`;
+            const url = `${AI_CONFIG.apiProxy.speechUrl}?${params.toString()}`;
 
             // 调用后端代理 API
             const response = await fetch(url, {
@@ -148,35 +129,24 @@ class SpeechRecognitionService {
             }
 
             const result = await response.json();
-            console.log('✅ Whisper 识别结果:', result);
+            console.log('✅ Minimax 识别结果:', result);
 
             this.isListening = false;
 
-            // 处理响应格式
-            if (AI_CONFIG.whisper.responseFormat === 'verbose_json') {
-                return {
-                    success: true,
-                    text: result.text,
-                    language: result.language,
-                    duration: result.duration,
-                    words: result.words, // 词级时间戳
-                    segments: result.segments, // 句子级时间戳
-                    confidence: this.calculateConfidence(result)
-                };
-            } else {
-                return {
-                    success: true,
-                    text: result.text || result,
-                    confidence: 0.95 // Whisper 默认高置信度
-                };
-            }
+            return {
+                success: true,
+                text: result.text,
+                language: result.language,
+                duration: result.duration,
+                confidence: result.confidence || 0.95
+            };
 
         } catch (error) {
             this.isListening = false;
-            console.error('❌ Whisper 识别错误:', error);
+            console.error('❌ Minimax 识别错误:', error);
             
             // 自动降级到浏览器原生模式
-            console.log('🔄 Whisper API 不可用，自动切换到浏览器原生识别...');
+            console.log('🔄 Minimax API 不可用，自动切换到浏览器原生识别...');
             
             // 初始化浏览器识别（如果还未初始化）
             if (!this.recognition) {
@@ -189,7 +159,7 @@ class SpeechRecognitionService {
                     return await this.startBrowserRecognition();
                 } catch (browserError) {
                     console.error('❌ 浏览器识别也失败:', browserError);
-                    throw new Error('语音识别不可用：Whisper API 和浏览器识别都失败');
+                    throw new Error('语音识别不可用：Minimax API 和浏览器识别都失败');
                 }
             } else {
                 throw new Error('语音识别不可用：浏览器不支持语音识别');
@@ -262,15 +232,15 @@ class SpeechRecognitionService {
 
     // 检查浏览器是否支持
     isSupported() {
-        if (this.mode === 'whisper') {
-            return true; // Whisper API 始终可用（如果有 API Key）
+        if (this.mode === 'minimax') {
+            return true; // Minimax API 始终可用（如果有 API Key）
         }
         return this.recognition !== null;
     }
 
     // 切换识别模式
     switchMode(mode) {
-        if (mode === 'browser' || mode === 'whisper') {
+        if (mode === 'browser' || mode === 'minimax') {
             this.mode = mode;
             AI_CONFIG.speechMode = mode;
             console.log(`🔄 切换到 ${mode} 模式`);
